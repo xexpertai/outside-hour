@@ -21,7 +21,7 @@ Bengaluru as a demo start, 60 minutes, 07:00 the next morning. The plan Gemma wr
 "on this screen" time includes the model wait, and the 20 s "away" is a **simulated** phone lock (headless
 browsers never hide a page, so `scripts/record_demo.py` tells the page it is hidden, as a locked phone would).
 
-**Demo video:** [`demo/outside-hour-demo-v2.mp4`](demo/outside-hour-demo-v2.mp4) (81 s, 1920×1080, English
+**Demo video:** [YouTube](https://youtu.be/Tsh3luZPPXA) · [`demo/outside-hour-demo-v2.mp4`](demo/outside-hour-demo-v2.mp4) (81 s, 1920×1080, English
 voiceover). It is the real phone-size run above, framed and zoomed: the 29 s model wait is cut and labelled, the
 20 s "away" part is shown at 4× speed and labelled as a simulated lock, and a second real run (Lalbagh, 45 min,
 17:30) is shown for a few seconds. The voice is Kokoro (local TTS) and the music was synthesised for the video.
