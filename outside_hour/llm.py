@@ -95,7 +95,7 @@ class LlamaServer:
         prompt = self._post("/apply-template", {"messages": messages,
                                                 "chat_template_kwargs": {"enable_thinking": False}})["prompt"]
         # 2) Complete it under a JSON-schema grammar that applies from the very first token. (Through the
-        #    chat endpoint, Gemma 4 sometimes starts a long "thinking" channel first, which costs ~45 s on
+        #    chat endpoint, Gemma 4 sometimes starts a long "thinking" channel first, which costs ~47 s on
         #    a CPU and bypasses the grammar.) The enum means place_id can only be a place we fetched.
         d = self._post("/completion", {
             "prompt": prompt,

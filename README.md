@@ -47,21 +47,21 @@ laptop; the model wait is cut and labelled on screen. The uncut recording is
 ## Measured on my laptop
 
 Intel Core i5-1035G1 (4 cores / 8 threads, no GPU), 10 GB RAM, WSL2. Model file: `gemma-4-E2B-it-Q4_0.gguf`,
-2.84 GB. Numbers from `scripts/bench.py`: 10 different plans (3 cities, 30–90 min, morning to evening) on cached data (see `docs/bench-results.json`):
+2.84 GB. Numbers from `scripts/bench.py`: 10 different plans (2 cities, 3 start points, 30–90 min, morning to evening) on cached data (see `docs/bench-results.json`):
 
 | Measure | Result |
 |---|---|
 | Plans written by Gemma (not the template) | 10 of 10 |
 | Drafts rejected by the checker | 1 (it shortened the name to "The Botanical Gardens"; the retry passed) |
 | Time per plan, median (min–max) | 24.8 s (12.8–43.7 s) |
-| Prompt size / speed, median | 650 tokens at 55 tokens/s |
+| Prompt, median | ~920 tokens (650 new, the rest reused from llama.cpp's prompt cache), processed at 55 tokens/s |
 | Output size / speed, median | 131 tokens at 10.1 tokens/s |
 | `llama-bench` pp512 / tg128, 4 threads | 61.9 / 9.4 tokens/s |
-| `llama-bench` pp512 / tg128, 8 threads | 59.9 / 7.5 tokens/s (so the start script uses physical cores) |
-| llama-server memory (RSS, 4096 context) | 4.7 GB |
+| `llama-bench` pp512 / tg128, 8 threads | 59.9 / 7.5 tokens/s (noisy, but physical cores were a little faster, so the start script uses them) |
+| llama-server memory after a plan (RSS, 4096 context, 4 threads) | about 4.3 GB (`docs/llama-bench.txt`) |
 
 The laptop was also running other work, so times vary from run to run. Before I switched off Gemma's
-"thinking" (see `outside_hour/llm.py`), one call spent all 400 output tokens thinking: 47.5 s and no answer.
+"thinking" (see `outside_hour/llm.py`), one call spent all 400 output tokens thinking: 47.5 s and no answer (logged in `docs/llama-bench.txt`).
 
 ## Setup
 
@@ -117,7 +117,8 @@ uv venv .venv && uv pip install --python .venv/bin/python pytest
   but not enforced.
 - The 2B model's "things to notice" are pleasant but often generic (birds, bark, light). The checker stops
   invented places and numbers; it does not make the writing brilliant.
-- A plan takes about 25 s on my CPU (median; 13–44 s in my benchmark). A GPU or a newer laptop is much faster.
+- About 25 s per plan on my CPU once the area's map data is cached (13–44 s in my benchmark). The first plan in a
+  new area also waits for OpenStreetMap (up to about 15 s in my runs). A GPU or a newer laptop is much faster.
 - Weather is a forecast. Use your own judgement outside, especially after dark.
 
 ## Data, models and credits

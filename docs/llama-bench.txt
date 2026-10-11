@@ -5,3 +5,9 @@
 build: 1cf776776 (11555)
 | gemma4 E2B Q4_0                |   2.63 GiB |     4.63 B | CPU        |       4 |           pp512 |         61.87 ± 1.57 |
 | gemma4 E2B Q4_0                |   2.63 GiB |     4.63 B | CPU        |       4 |           tg128 |          9.41 ± 2.90 |
+
+Memory (11 Oct 2026, measured with `ps -o rss=` on llama-server after one plan;
+started by scripts/start-model.sh: -c 4096, 4 threads): RSS 4284028 KB (about 4.3 GB).
+
+Thinking-mode observation during development (11 Oct 2026, chat endpoint, before the /completion fix):
+finish_reason "length", predicted_n 400, predicted_ms 47518 (about 47 s), content empty (all 400 tokens were "thinking").
