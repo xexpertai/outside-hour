@@ -25,7 +25,7 @@ browsers never hide a page, so `scripts/record_demo.py` tells the page it is hid
 voiceover). It is the real phone-size run above, framed and zoomed: the 29 s model wait is cut and labelled, the
 20 s "away" part is shown at 4× speed and labelled as a simulated lock, and a second real run (Lalbagh, 45 min,
 17:30) is shown for a few seconds. The voice is Kokoro (local TTS) and the music was synthesised for the video.
-The uncut phone recordings are not in the repository; they are available on request.
+The uncut phone recordings are not in the repository (they are large); the cut, held frames and 4× part are labelled on screen.
 
 ![Outside Hour: pocket card, the 60-second ring running out, phone down](demo/outside-hour-demo-v2.gif)
 
