@@ -1,0 +1,284 @@
+{
+  "summary": {
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "threads": 8,
+    "model": "gemma-4-E2B-it-Q4_0",
+    "model_file_bytes": 2841481184,
+    "plans": 10,
+    "plans_written_by_model": 10,
+    "plans_fell_back_to_template": 0,
+    "drafts_rejected_total": 1,
+    "seconds_median": 24.84,
+    "seconds_min": 12.81,
+    "seconds_max": 43.65,
+    "output_tok_per_s_median": 10.149999999999999,
+    "prompt_tokens_median": 649.5,
+    "prompt_tok_per_s_median": 54.55,
+    "output_tokens_median": 130.5,
+    "model_seconds_median": 24.625
+  },
+  "rows": [
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 30,
+      "start": "07:00",
+      "seconds": 24.7,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Rest House Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 24.7,
+        "prompt_tokens": 747,
+        "cached_prompt_tokens": 0,
+        "prompt_tok_per_s": 63.8,
+        "output_tokens": 133,
+        "output_tok_per_s": 10.2
+      },
+      "headline": "Enjoy a morning walk in Rest House Park",
+      "notice": [
+        "Notice one flower that insects keep visiting.",
+        "Notice the smell of three different leaves.",
+        "Notice how the light falls through the leaves."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this fresh air. Turn back at 07:20."
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 60,
+      "start": "07:00",
+      "seconds": 12.81,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Cubbon Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 12.81,
+        "prompt_tokens": 5,
+        "cached_prompt_tokens": 922,
+        "prompt_tok_per_s": 20.2,
+        "output_tokens": 123,
+        "output_tok_per_s": 9.7
+      },
+      "headline": "Enjoy the shade at Cubbon Park",
+      "notice": [
+        "Look for three trees with different bark.",
+        "Listen for the loudest bird.",
+        "Find a patch of shade that is noticeably cooler."
+      ],
+      "phone_down_line": "Put your phone away and enjoy the fresh air around you now. Turn back at 07:40."
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 90,
+      "start": "16:00",
+      "seconds": 29.66,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Cubbon Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 29.66,
+        "prompt_tokens": 962,
+        "cached_prompt_tokens": 0,
+        "prompt_tok_per_s": 56.5,
+        "output_tokens": 131,
+        "output_tok_per_s": 10.3
+      },
+      "headline": "Enjoy the park's shade and greenery",
+      "notice": [
+        "Look for three trees with different bark.",
+        "Find the loudest bird.",
+        "Notice a patch of shade that is noticeably cooler."
+      ],
+      "phone_down_line": "Put the phone away and enjoy this moment outside. Turn back at 17:10."
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 45,
+      "start": "06:30",
+      "seconds": 43.65,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Botanical Gardens",
+      "rejected": [
+        "why mentions 'The Botanical Gardens', which is not in the fetched map data"
+      ],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 13.41,
+        "prompt_tokens": 1,
+        "cached_prompt_tokens": 999,
+        "prompt_tok_per_s": 8.0,
+        "output_tokens": 135,
+        "output_tok_per_s": 10.1
+      },
+      "headline": "Explore the serene Lalbagh Botanical Gardens",
+      "notice": [
+        "Notice one flower that insects keep visiting.",
+        "Notice the smell of three different leaves.",
+        "Notice how the light falls through the leaves."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this beautiful morning walk. Turn back at 07:08."
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 60,
+      "start": "17:30",
+      "seconds": 27.44,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Botanical Gardens",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 27.44,
+        "prompt_tokens": 792,
+        "cached_prompt_tokens": 0,
+        "prompt_tok_per_s": 57.6,
+        "output_tokens": 136,
+        "output_tok_per_s": 9.9
+      },
+      "headline": "Relax in the shade at Lalbagh Botanical Gardens",
+      "notice": [
+        "Look for three trees with different bark.",
+        "Listen for the loudest bird.",
+        "Notice a patch of shade that is noticeably cooler."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this peaceful moment outside. Turn back at 17:45."
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 45,
+      "start": "07:00",
+      "seconds": 24.98,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Empress Botanical Garden",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 24.98,
+        "prompt_tokens": 654,
+        "cached_prompt_tokens": 275,
+        "prompt_tok_per_s": 55.1,
+        "output_tokens": 135,
+        "output_tok_per_s": 10.2
+      },
+      "headline": "Enjoy the clear morning at Empress Botanical Garden",
+      "notice": [
+        "Look for one flower that insects keep visiting.",
+        "Notice the smell of three different leaves.",
+        "Observe how the light falls through the leaves."
+      ],
+      "phone_down_line": "Put your phone away and enjoy the fresh morning air. Turn back at 07:36."
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 60,
+      "start": "18:30",
+      "seconds": 26.01,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Empress Botanical Garden",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 26.01,
+        "prompt_tokens": 814,
+        "cached_prompt_tokens": 0,
+        "prompt_tok_per_s": 56.9,
+        "output_tokens": 122,
+        "output_tok_per_s": 10.3
+      },
+      "headline": "Evening stroll in the Botanical Garden",
+      "notice": [
+        "Observe one flower that insects keep visiting.",
+        "Notice the smell of three different leaves.",
+        "Feel how the light falls through the leaves."
+      ],
+      "phone_down_line": "Put your phone away and enjoy the evening air. Turn back at 19:21."
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 45,
+      "start": "12:30",
+      "seconds": 23.89,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Rest House Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 23.89,
+        "prompt_tokens": 609,
+        "cached_prompt_tokens": 297,
+        "prompt_tok_per_s": 53.8,
+        "output_tokens": 130,
+        "output_tok_per_s": 10.3
+      },
+      "headline": "Explore Rest House Park",
+      "notice": [
+        "Look for a patch of shade that is noticeably cooler.",
+        "Notice how the light falls through the leaves.",
+        "Listen for the loudest bird."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this time outside. Turn back at 13:05."
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 90,
+      "start": "07:00",
+      "seconds": 24.55,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Botanical Gardens",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 24.55,
+        "prompt_tokens": 645,
+        "cached_prompt_tokens": 297,
+        "prompt_tok_per_s": 53.3,
+        "output_tokens": 125,
+        "output_tok_per_s": 10.0
+      },
+      "headline": "Explore the greenery at Lalbagh Botanical Gardens",
+      "notice": [
+        "You can look for three trees with different bark.",
+        "Listen to the loudest bird.",
+        "Notice a patch of shade that is noticeably cooler."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this time outdoors. Turn back at 08:23."
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 30,
+      "start": "16:30",
+      "seconds": 23.31,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Empress Botanical Garden",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 23.31,
+        "prompt_tokens": 558,
+        "cached_prompt_tokens": 230,
+        "prompt_tok_per_s": 54.0,
+        "output_tokens": 126,
+        "output_tok_per_s": 9.6
+      },
+      "headline": "Explore the Empress Botanical Garden",
+      "notice": [
+        "Look for one flower that insects keep visiting.",
+        "Notice the smell of three different leaves.",
+        "Observe how the light falls through the leaves."
+      ],
+      "phone_down_line": "Put your phone away and enjoy this time outside. Turn back at 16:51."
+    }
+  ]
+}

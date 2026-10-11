@@ -1,0 +1,13 @@
+models/
+.tools/
+.venv/
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+demo/raw/
+.env*
+POST.md
+NOTES-FOR-HARSHA.md
+POST-EMAIL.txt
+demo/old/

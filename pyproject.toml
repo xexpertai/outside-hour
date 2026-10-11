@@ -1,0 +1,17 @@
+[project]
+name = "outside-hour"
+version = "0.1.0"
+description = "One short, real plan to get outside, written by a local open-weight model (Gemma) from OpenStreetMap and Open-Meteo data."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = []  # standard library only; the model runs in llama.cpp's llama-server
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+outside-hour = "outside_hour.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
