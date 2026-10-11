@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import re
 
+from .places import has_view, has_water
+
 PLACE_WORDS = (
     "Park|Lake|Garden|Gardens|Trail|Road|Pond|Hill|Hills|Temple|Street|Lane|Gate|Cafe|Café|Market|Museum|"
     "Station|Forest|Reserve|Tank|Fort|Beach|River|Bridge|Square|Circle|Nagar|Marg|Lawn|Grove|Woods|Falls|Point"
@@ -40,11 +42,15 @@ CLOCK_RE = re.compile(r"\b\d{1,2}:\d{2}\b")
 
 
 VOICE_RE = re.compile(r"\b(we|us|me|our|let's|lets)\b", re.I)
-# Features the model may only mention when the chosen kind of place implies them.
+# Features the model may only mention when the facts support them (the kind of place, or what OSM maps inside).
 FEATURE_RULES = [
-    (re.compile(r"\b(ripples?|lake|pond|water'?s?|shore|reflections?)\b", re.I), {"water", "beach"}),
-    (re.compile(r"\b(landmarks?|vantage|horizon|skyline)\b", re.I), {"viewpoint", "hilltop"}),
+    (re.compile(r"\b(ripples?|lake|pond|water'?s?|shore|reflections?)\b", re.I), has_water),
+    (re.compile(r"\b(landmarks?|vantage|horizon|skyline)\b", re.I), has_view),
 ]
+# Filler that says nothing about this place. The prompt asks for specifics; this makes it stick.
+BLAND_RE = re.compile(r"\b(pleasant (spot|place|walk)|offers? a (pleasant|nice|great|lovely)|"
+                      r"enjoy the (park|nature|outdoors|fresh air)|perfect (spot|place)|great (spot|place)|"
+                      r"beautiful (spot|place)|connect with nature)\b", re.I)
 
 
 def check(out: dict, candidates, known_names: list[str], allowed_nums: set[str],
@@ -76,19 +82,25 @@ def check(out: dict, candidates, known_names: list[str], allowed_nums: set[str],
     for k, v in texts.items():
         if VOICE_RE.search(v):
             return False, f"{k} speaks as 'we/us/me' ({VOICE_RE.search(v).group(0)!r})"
-        for rx, kinds in FEATURE_RULES:
+        for rx, supported in FEATURE_RULES:
             m = rx.search(v)
-            if m and chosen.kind not in kinds and m.group(0).lower() not in chosen.name.lower():
+            if m and not supported(chosen) and m.group(0).lower() not in chosen.name.lower():
                 return False, f"{k} mentions {m.group(0)!r}, which the facts don't support for a {chosen.kind}"
+        if k in ("headline", "why") and BLAND_RE.search(v):
+            return False, f"{k} is generic filler ({BLAND_RE.search(v).group(0)!r}); say something about this place"
 
     known = [_norm(n) for n in known_names if n and len(n.strip()) >= 4]
     chosen_n = _norm(chosen.name)
+    # Named things mapped inside the chosen place (a pond inside a park) may be mentioned.
+    inside = [_norm(n) for n in chosen.features.get("water", []) + chosen.features.get("named_spots", [])]
+    known += inside
     for k, v in texts.items():
         low = _norm(v)
         # 1) It must not talk up a different fetched place as the destination.
         for other in candidates:
             on = _norm(other.name)
-            if other.id != pid and len(on) >= 4 and on in low and on not in chosen_n:
+            if (other.id != pid and len(on) >= 4 and on in low and on not in chosen_n
+                    and not any(on in i or i in on for i in inside)):
                 return False, f"{k} mentions {other.name!r}, but the chosen place is {chosen.name!r}"
         # 2) Place-like names must exist in the fetched OSM data.
         for m in PLACE_RE.findall(v):

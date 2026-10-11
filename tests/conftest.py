@@ -34,6 +34,9 @@ class FixtureSources:
     def overpass(self, lat, lon, radius_m):
         return self._f("overpass")
 
+    def overpass_features(self, lat, lon, radius_m):
+        return self._f("overpass_features")
+
     def geocode(self, q):
         raise OfflineMiss("geocode")
 

@@ -40,10 +40,13 @@ class Handler(BaseHTTPRequestHandler):
         q = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
         if u.path in ("/", "/index.html"):
             return self._send(200, (STATIC / "index.html").read_bytes(), "text/html; charset=utf-8")
+        if u.path == "/attention.js":
+            return self._send(200, (STATIC / "attention.js").read_bytes(), "text/javascript; charset=utf-8")
         if u.path == "/api/health":
             c = llm.LlamaServer()
             name = c.model_name()
             return self._json(200, {"model": name, "model_ok": name != "local model", "offline": self.offline,
+                                    "attention_budget_s": 60,
                                     "presets": {k: v[0] for k, v in PRESETS.items()}})
         if u.path == "/api/plan":
             return self._plan(q)

@@ -2,133 +2,373 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e8eee4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1310" media="(prefers-color-scheme: dark)">
 <title>Outside Hour</title>
 <style>
   :root {
-    --bg: #f4f1e8; --ink: #1d2a1f; --muted: #5b6a5d; --card: #fffdf6; --line: #d9d3c2;
-    --accent: #2f6b3a; --accent-ink: #ffffff; --warn: #8a4b00; --warn-bg: #fff1dc;
+    --bg: #e8eee4; --bg-top: #dbe7e0; --ink: #14231a; --muted: #55645a; --card: #fbfcf7; --soft: #eef2ea;
+    --line: #d2dbcd; --accent: #2c6a3f; --accent-ink: #ffffff; --accent-soft: #dcebdc; --sky: #2b5f7c;
+    --sun: #9a5a0a; --warn: #7a4100; --warn-bg: #fbeed9; --ring-ok: #2c6a3f; --ring-low: #b97412;
+    --ring-over: #b0442a; --track: #d2dbcd; --shadow: 0 1px 2px rgba(20, 35, 26, .06), 0 8px 24px rgba(20, 35, 26, .08);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1310; --bg-top: #111a16; --ink: #e6ece4; --muted: #9aa89d; --card: #161d18; --soft: #1c251f;
+      --line: #28332c; --accent: #82c595; --accent-ink: #08110b; --accent-soft: #1f3326; --sky: #8cc0dc;
+      --sun: #f0b45a; --warn: #ffd59a; --warn-bg: #3a2a12; --ring-ok: #82c595; --ring-low: #e7a940;
+      --ring-over: #ec8a6c; --track: #2a352e; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1310; --bg-top: #111a16; --ink: #e6ece4; --muted: #9aa89d; --card: #161d18; --soft: #1c251f;
+    --line: #28332c; --accent: #82c595; --accent-ink: #08110b; --accent-soft: #1f3326; --sky: #8cc0dc;
+    --sun: #f0b45a; --warn: #ffd59a; --warn-bg: #3a2a12; --ring-ok: #82c595; --ring-low: #e7a940;
+    --ring-over: #ec8a6c; --track: #2a352e; --shadow: none;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 560px; margin: 0 auto; padding: 20px 16px 48px; }
-  h1 { font-size: 28px; margin: 4px 0 2px; letter-spacing: -0.5px; }
-  .sub { color: var(--muted); margin: 0 0 18px; }
-  label { display: block; font-weight: 600; margin: 16px 0 6px; }
-  input[type=text], input[type=time] { width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line);
-         border-radius: 10px; background: var(--card); color: var(--ink); }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .chip { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px;
-          padding: 9px 14px; font: inherit; cursor: pointer; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font: 17px/1.5 var(--sans);
+         background: linear-gradient(180deg, var(--bg-top), var(--bg) 320px) var(--bg); }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px calc(40px + env(safe-area-inset-bottom)); }
+
+  /* ---- top bar with the attention budget ---- */
+  .top { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+         background: color-mix(in srgb, var(--bg-top) 82%, transparent); border-bottom: 1px solid transparent; }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+               padding-top: calc(10px + env(safe-area-inset-top)); padding-bottom: 10px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: -.2px; font-size: 17px; }
+  .brand svg { width: 26px; height: 26px; flex: none; }
+  .budget { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line);
+            border-radius: 999px; padding: 4px 14px 4px 4px; box-shadow: var(--shadow); }
+  .budget svg { width: 40px; height: 40px; flex: none; transform: rotate(-90deg); }
+  .budget .tr { stroke: var(--track); }
+  .budget .arc { stroke: var(--ring-ok); transition: stroke-dashoffset .5s linear, stroke .6s; }
+  .budget[data-phase="low"] .arc { stroke: var(--ring-low); }
+  .budget[data-phase="over"] .arc { stroke: var(--ring-over); }
+  .budget .num { font: 700 20px/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .budget .lbl { display: block; font-size: 11.5px; line-height: 1.2; color: var(--muted); letter-spacing: .2px; }
+  .budget[data-phase="over"] .num { color: var(--ring-over); }
+
+  /* ---- form ---- */
+  .hero { padding: 22px 0 6px; }
+  .hero h1 { font: 700 32px/1.12 var(--serif); letter-spacing: -.5px; margin: 0 0 8px; }
+  .hero p { margin: 0; color: var(--muted); }
+  .why-budget { margin-top: 12px; font-size: 14.5px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+  .why-budget b { color: var(--ink); }
+  .field { margin-top: 22px; }
+  .field > .lab { display: block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px;
+                  color: var(--muted); margin-bottom: 8px; }
+  input[type=text], input[type=time] { width: 100%; padding: 14px 14px; border: 1px solid var(--line); border-radius: 14px;
+         background: var(--card); font-size: 17px; min-height: 52px; }
+  input::placeholder { color: var(--muted); opacity: .8; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 9px 14px;
+          font-size: 15px; min-height: 42px; }
   .chip[aria-pressed=true] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-  .go { width: 100%; margin-top: 22px; padding: 15px; font: 600 18px system-ui, sans-serif; border: 0;
-        border-radius: 12px; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
-  .go:disabled { opacity: .6; }
-  .clock { position: fixed; top: 10px; right: 12px; font: 600 13px ui-monospace, monospace; color: var(--muted);
-           background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
-  .status { margin-top: 14px; color: var(--muted); min-height: 1.4em; }
-  .err { color: #9b1c1c; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 18px; }
-  .card h2 { margin: 0 0 6px; font-size: 22px; line-height: 1.25; }
-  .times { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; text-align: center; }
-  .times div { background: var(--bg); border-radius: 10px; padding: 8px 4px; }
-  .times b { display: block; font-size: 22px; }
-  .times span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-  .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin: 16px 0 4px; }
-  .card ul { margin: 0; padding-left: 20px; }
-  .warn { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 8px 10px; margin: 8px 0; }
-  .meta { font-size: 13px; color: var(--muted); margin-top: 14px; }
-  .meta a { color: var(--muted); }
-  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-  .actions button { padding: 12px; font: 600 15px system-ui, sans-serif; border-radius: 10px; cursor: pointer;
-                    border: 1px solid var(--accent); background: var(--card); color: var(--accent); }
-  .actions .primary { grid-column: 1 / -1; background: var(--accent); color: var(--accent-ink); font-size: 17px; }
-  .badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #e6efe3;
-           color: var(--accent); font-weight: 600; }
-  .badge.t { background: #eee; color: #555; }
-  /* Phone-down view: dark, huge, nothing to scroll. */
-  #down { display: none; position: fixed; inset: 0; background: #000; color: #eaeaea; padding: 28px 22px;
-          flex-direction: column; justify-content: center; text-align: center; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--soft);
+         border: 1px solid var(--line); padding: 5px; border-radius: 16px; }
+  .seg button { border: 0; background: transparent; border-radius: 12px; padding: 10px 0 8px; min-height: 56px; }
+  .seg button b { display: block; font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .seg button span { font-size: 12px; color: var(--muted); }
+  .seg button[aria-pressed=true] { background: var(--card); box-shadow: var(--shadow); outline: 2px solid var(--accent); }
+  .when { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; }
+  .when .chip { min-height: 52px; padding: 0 20px; font-size: 16px; }
+  .go { width: 100%; margin-top: 26px; padding: 17px; font: 700 19px var(--sans); border: 0; border-radius: 16px;
+        background: var(--accent); color: var(--accent-ink); min-height: 60px; box-shadow: var(--shadow); }
+  .go:disabled { opacity: .55; cursor: progress; }
+  .status { margin-top: 14px; min-height: 1.4em; color: var(--muted); }
+  .status.err { color: var(--ring-over); font-weight: 600; }
+  .steps { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+  .steps li { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 15.5px; }
+  .steps li i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); flex: none; font-style: normal;
+                display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+  .steps li.now { color: var(--ink); font-weight: 600; }
+  .steps li.now i { border-color: var(--accent); border-top-color: transparent; animation: spin 1s linear infinite; }
+  .steps li.done i { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .steps .note { font-size: 13.5px; color: var(--muted); padding-left: 30px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- the pocket card ---- */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; margin-top: 22px;
+          box-shadow: var(--shadow); overflow: hidden; scroll-margin-top: 76px; }
+  .card .pad { padding: 20px 20px 0; }
+  .eyebrow { font-size: 13px; color: var(--muted); letter-spacing: .2px; }
+  .place { font: 700 clamp(30px, 9vw, 40px)/1.06 var(--serif); letter-spacing: -.6px; margin: 6px 0 6px; overflow-wrap: anywhere; }
+  .kind { color: var(--muted); font-size: 15.5px; }
+  .headline { font-size: 18px; font-weight: 600; color: var(--accent); margin: 12px 0 0; line-height: 1.35; }
+  .times { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 0; margin: 18px 0 0; border-top: 1px solid var(--line);
+           border-bottom: 1px solid var(--line); }
+  .times > div { padding: 14px 4px 12px; text-align: center; }
+  .times > div + div { border-left: 1px solid var(--line); }
+  .times b { display: block; font: 800 30px/1 var(--sans); letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+  .times span { display: block; margin-top: 6px; font-size: 11.5px; font-weight: 700; color: var(--muted);
+                text-transform: uppercase; letter-spacing: 1px; }
+  .times .turn { background: var(--accent-soft); }
+  .times .turn b { font-size: 38px; color: var(--accent); }
+  .tl { display: flex; height: 10px; gap: 2px; margin: 14px 20px 6px; border-radius: 99px; overflow: hidden; }
+  .tl i { display: block; height: 100%; }
+  .tl .w { background: var(--sky); opacity: .55; } .tl .t { background: var(--accent); } .tl .s { background: var(--line); }
+  .tl-legend { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin: 0 20px; }
+  .sec { padding: 16px 20px 0; }
+  .sec h3 { font-size: 12.5px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .dir { display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: center; background: var(--soft);
+         border-radius: 16px; padding: 12px; margin: 16px 20px 0; }
+  .dir svg { width: 92px; height: 92px; }
+  .dir .big { font: 800 22px/1.15 var(--sans); }
+  .dir .sub { font-size: 14.5px; color: var(--muted); margin-top: 3px; }
+  .dir .tag { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--sky);
+              border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+  .why { font-size: 17px; margin: 0; }
+  .notice { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; counter-reset: n; }
+  .notice li { display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: baseline; counter-increment: n; }
+  .notice li::before { content: counter(n); font: 800 22px/1 var(--serif); color: var(--accent); text-align: center; }
+  .mapped { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mapped span { font-size: 13.5px; background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+  .bring { margin: 0; padding-left: 20px; }
+  .bring li { margin: 2px 0; }
+  .wx { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 15px; }
+  .wx b { font-variant-numeric: tabular-nums; }
+  .warn { background: var(--warn-bg); color: var(--warn); border-radius: 12px; padding: 10px 12px; margin: 14px 20px 0;
+          font-size: 15px; font-weight: 600; }
+  .pdl { margin: 18px 20px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--soft);
+         border-radius: 0 12px 12px 0; font-weight: 700; font-size: 17px; }
+  .foot { padding: 16px 20px 18px; margin-top: 18px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
+  .foot a { color: inherit; }
+  .foot p { margin: 6px 0 0; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; padding: 3px 10px;
+           border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .badge.t { background: var(--soft); color: var(--muted); }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .actions button { min-height: 52px; padding: 12px; font-weight: 700; font-size: 15.5px; border-radius: 14px;
+                    border: 1.5px solid var(--accent); background: var(--card); color: var(--accent); }
+  .actions .primary { grid-column: 1 / -1; min-height: 62px; font-size: 20px; background: var(--accent); color: var(--accent-ink);
+                      display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .credit { font-size: 12.5px; color: var(--muted); text-align: center; margin-top: 22px; }
+
+  /* ---- attention budget: gentle dimming and a nudge ---- */
+  #dim { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 15; transition: opacity 1s; }
+  #nudge { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%);
+           width: min(448px, calc(100% - 32px)); z-index: 30; background: var(--ink); color: var(--card);
+           border-radius: 18px; padding: 14px 14px 12px 18px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
+           box-shadow: 0 10px 30px rgba(0,0,0,.25); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+  #nudge.on { transform: translate(-50%, 0); }
+  #nudge p { margin: 0; font-size: 15.5px; line-height: 1.35; flex: 1 1 100%; font-weight: 600; }
+  #nudge .sp { flex: 1; }
+  #nudge button { border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 700; background: var(--accent); color: var(--accent-ink); }
+  #nudge .x { background: transparent; color: inherit; opacity: .7; padding: 10px 6px; font-weight: 600; }
+
+  /* ---- phone down: black, huge, nothing to scroll ---- */
+  #down { display: none; position: fixed; inset: 0; z-index: 50; background: #000; color: #d9ddd6; text-align: center;
+          padding: calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
+          flex-direction: column; justify-content: center; align-items: center; overflow: auto; }
   #down.on { display: flex; }
-  #down .big { font-size: 64px; font-weight: 700; letter-spacing: -1px; margin: 8px 0; color: #fff; }
-  #down .place { font-size: 24px; margin-bottom: 18px; }
-  #down .small { color: #9a9a9a; font-size: 16px; }
-  #down button { align-self: center; margin-top: 28px; background: none; color: #777; border: 1px solid #333; border-radius: 999px;
-                 padding: 8px 16px; font: inherit; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --bg: #121611; --ink: #e8eadf; --muted: #a2ab9d; --card: #1b211a;
-      --line: #2e372c; --accent: #79b886; --accent-ink: #0d140e; --warn: #ffcf8a; --warn-bg: #3a2a12; }
-    :root:not([data-theme="light"]) .badge { background: #233024; }
+  #down .k { font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: #8b938b; font-weight: 700; }
+  #down .pl { font: 700 clamp(26px, 8vw, 34px)/1.15 var(--serif); color: #fff; margin: 6px 0 4px; max-width: 420px; }
+  #down .dirl { color: #9fb7a5; font-size: 15px; display: flex; align-items: center; gap: 8px; justify-content: center; }
+  #down .dirl svg { width: 22px; height: 22px; }
+  #down .t { font: 800 clamp(76px, 26vw, 120px)/1 var(--sans); letter-spacing: -3px; color: #fff; margin: 8px 0 2px;
+             font-variant-numeric: tabular-nums; }
+  #down .back { color: #a7ada6; font-size: 17px; }
+  #down .meters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 380px; margin-top: 30px; }
+  #down .meters div { border: 1px solid #262b26; border-radius: 16px; padding: 12px 8px; }
+  #down .meters b { display: block; font: 800 28px/1.1 var(--sans); color: #fff; font-variant-numeric: tabular-nums; }
+  #down .meters .away b { color: #8fd3a2; }
+  #down .meters span { font-size: 12.5px; color: #8b938b; }
+  #down .cmp { margin-top: 14px; font-size: 15px; color: #c4cbc3; max-width: 380px; }
+  #down .fine { margin-top: 8px; font-size: 12px; color: #6f766f; max-width: 360px; }
+  #down .exit { margin-top: 22px; background: none; color: #8b938b; border: 1px solid #2c312c; border-radius: 999px; padding: 10px 18px; }
+
+  @media (min-width: 720px) {
+    body { background: radial-gradient(1200px 600px at 50% -200px, var(--bg-top), var(--bg)) var(--bg); }
+    .hero h1 { font-size: 36px; }
   }
-  :root[data-theme="dark"] { --bg: #121611; --ink: #e8eadf; --muted: #a2ab9d; --card: #1b211a;
-      --line: #2e372c; --accent: #79b886; --accent-ink: #0d140e; --warn: #ffcf8a; --warn-bg: #3a2a12; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* ---- printable pocket card: one A6-wide card, everything else hidden ---- */
   @media print {
-    body { background: #fff; color: #000; font-size: 12px; }
-    .clock, #form, .actions, .status, header { display: none !important; }
-    main { padding: 0; }
-    .card { border: 1px dashed #000; width: 105mm; break-inside: avoid; }
+    @page { size: A4 portrait; margin: 12mm; }
+    body { background: #fff !important; color: #000; font-size: 10.5pt; }
+    .top, .hero, #form, .actions, .credit, #nudge, #dim, #down, .steps, .status { display: none !important; }
+    .wrap { max-width: none; padding: 0; }
+    .card { width: 105mm; margin: 0; border: 1.2pt dashed #000; border-radius: 4mm; box-shadow: none; background: #fff;
+            break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card .pad, .sec { padding: 3.5mm 5mm 0; }
+    .place { font-size: 20pt; color: #000; }
+    .headline { font-size: 11pt; color: #000; margin-top: 2mm; }
+    .kind, .eyebrow { font-size: 8.5pt; color: #333; }
+    .times { margin-top: 3mm; border-color: #000; }
+    .times > div { padding: 2.5mm 1mm 2mm; }
+    .times > div + div { border-color: #000; }
+    .times b { font-size: 16pt; color: #000; }
+    .times .turn { background: #fff; }
+    .times .turn b { font-size: 20pt; color: #000; text-decoration: underline; text-underline-offset: 2pt; }
+    .times span { font-size: 6.5pt; color: #000; }
+    .tl, .tl-legend { display: none; }
+    .dir { background: #fff; border: 0.8pt solid #000; margin: 3mm 5mm 0; padding: 2mm; grid-template-columns: 20mm 1fr; gap: 3mm; }
+    .dir svg { width: 20mm; height: 20mm; }
+    .dir .big { font-size: 11pt; } .dir .sub { font-size: 8.5pt; color: #000; } .dir .tag { color: #000; font-size: 7pt; }
+    .sec h3 { font-size: 7.5pt; color: #000; margin-bottom: 1mm; }
+    .why, .notice li, .bring li, .wx { font-size: 9pt; }
+    .notice { gap: 1mm; } .notice li { grid-template-columns: 5mm 1fr; gap: 1mm; } .notice li::before { font-size: 11pt; color: #000; }
+    .mapped span { font-size: 7.5pt; background: #fff; border-color: #000; padding: 0 2mm; }
+    .warn { background: #fff; color: #000; border: 0.8pt solid #000; margin: 3mm 5mm 0; font-size: 8.5pt; padding: 1.5mm 2mm; }
+    .pdl { margin: 3mm 5mm 0; background: #fff; border-color: #000; font-size: 9.5pt; padding: 1.5mm 3mm; }
+    .foot { font-size: 7pt; color: #000; padding: 2.5mm 5mm 3mm; margin-top: 3mm; border-color: #000; }
+    .badge { background: #fff; color: #000; border: 0.6pt solid #000; font-size: 7pt; padding: 0 2mm; }
+    .foot .osm { display: none; }
   }
 </style>
+<script src="/attention.js"></script>
 </head>
 <body>
-<div class="clock" id="clock" title="Time spent on this screen">screen 0:00</div>
-<main>
-  <header>
-    <h1>Outside Hour</h1>
-    <p class="sub">Tell it where you are and how long you have. Get one plan, then put the phone away.</p>
-  </header>
+<div id="dim" aria-hidden="true"></div>
 
-  <section id="form">
-    <label for="near">Where are you starting?</label>
-    <input id="near" type="text" placeholder="A place name, or tap a demo start below" autocomplete="off">
-    <div class="row" style="margin-top:8px" id="presets"></div>
-    <div class="row" style="margin-top:8px"><button class="chip" id="geo" type="button">Use my location</button></div>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--accent)"/>
+        <path d="M16 6c-5 5-6 10-2 15M16 6c5 5 6 10 2 15M16 9v17" stroke="var(--accent-ink)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Outside Hour
+    </div>
+    <div class="budget" id="budget" data-phase="ok" role="group" aria-label="Screen budget: time this page has been on screen">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle class="tr" cx="20" cy="20" r="16" fill="none" stroke-width="5"/>
+        <circle class="arc" id="arc" cx="20" cy="20" r="16" fill="none" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="100.53" stroke-dashoffset="0"/>
+      </svg>
+      <div><span class="num" id="b-num">60 s</span><span class="lbl" id="b-lbl">screen budget left</span></div>
+    </div>
+  </div>
+</header>
 
-    <label>How long do you have?</label>
-    <div class="row" id="mins">
-      <button class="chip" type="button" data-v="30">30 min</button>
-      <button class="chip" type="button" data-v="45">45 min</button>
-      <button class="chip" type="button" data-v="60" aria-pressed="true">60 min</button>
-      <button class="chip" type="button" data-v="90">90 min</button>
+<main class="wrap">
+  <section class="hero" id="intro">
+    <h1>One short trip outside. Then phone down.</h1>
+    <p>Say where you are and how long you have. You get one real place nearby, when to turn back, and three things to notice.</p>
+    <div class="why-budget">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;margin-top:3px"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 2h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <span>This page gives itself a <b>60-second budget</b>. The ring counts only the time this page is visible on your screen; hidden time doesn't count.</span>
+    </div>
+  </section>
+
+  <section id="form" aria-label="Plan">
+    <div class="field">
+      <label class="lab" for="near">Starting from</label>
+      <input id="near" type="text" placeholder="A place name, or pick a demo start" autocomplete="off">
+      <div class="chips" id="presets"></div>
+      <div class="chips"><button class="chip" id="geo" type="button">Use my location</button></div>
     </div>
 
-    <label for="start">When?</label>
-    <div class="row">
-      <button class="chip" type="button" id="now" aria-pressed="true">Now</button>
-      <span style="align-self:center;color:var(--muted)">or later, at</span>
-      <input id="start" type="time" style="width:auto" aria-label="Later, at">
+    <div class="field">
+      <span class="lab" id="mins-l">Time you have</span>
+      <div class="seg" id="mins" role="group" aria-labelledby="mins-l">
+        <button type="button" data-v="30"><b>30</b><span>min</span></button>
+        <button type="button" data-v="45"><b>45</b><span>min</span></button>
+        <button type="button" data-v="60" aria-pressed="true"><b>60</b><span>min</span></button>
+        <button type="button" data-v="90"><b>90</b><span>min</span></button>
+      </div>
     </div>
 
-    <button class="go" id="go">Plan my outside hour</button>
-    <div class="status" id="status" role="status"></div>
+    <div class="field">
+      <span class="lab" id="when-l">When</span>
+      <div class="when" role="group" aria-labelledby="when-l">
+        <button class="chip" type="button" id="now" aria-pressed="true">Now</button>
+        <input id="start" type="time" aria-label="Or later, at this time">
+      </div>
+    </div>
+
+    <button class="go" id="go" type="button">Plan my outside hour</button>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <ol class="steps" id="steps" hidden></ol>
   </section>
 
   <div id="out"></div>
+  <p class="credit">Map data © OpenStreetMap contributors (ODbL) · Weather: Open-Meteo.com (CC BY 4.0)</p>
 </main>
 
-<div id="down" aria-live="polite">
-  <div class="small">Go to</div>
-  <div class="place" id="d-place"></div>
-  <div class="small">Turn back at</div>
-  <div class="big" id="d-turn"></div>
-  <div class="small" id="d-back"></div>
-  <div class="small" id="d-screen" style="margin-top:22px"></div>
-  <button id="d-exit" type="button">show the full card</button>
+<div id="nudge" role="status" aria-live="polite">
+  <p id="nudge-t">Your 60 seconds are up.</p>
+  <span class="sp"></span>
+  <button type="button" id="nudge-go">Phone down</button>
+  <button type="button" class="x" id="nudge-x" aria-label="Dismiss">Later</button>
+</div>
+
+<div id="down" aria-live="polite" role="dialog" aria-label="Phone down">
+  <div class="k">Go to</div>
+  <div class="pl" id="d-place"></div>
+  <div class="dirl" id="d-dir"></div>
+  <div class="k" style="margin-top:26px">Turn back at</div>
+  <div class="t" id="d-turn"></div>
+  <div class="back" id="d-back"></div>
+  <div class="meters">
+    <div><b id="d-screen">0:00</b><span>on this screen</span></div>
+    <div class="away"><b id="d-away">0:00</b><span>away from it</span></div>
+  </div>
+  <div class="cmp" id="d-cmp"></div>
+  <div class="fine">Measured by this page only (Page Visibility API): "on this screen" is the time the page was visible, "away" is the time it has been hidden since you tapped Phone down. It can't see other apps.</div>
+  <button class="exit" id="d-exit" type="button">show the card</button>
 </div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const t0 = Date.now();
-let frozen = null, minutes = 60, loc = null, plan = null;
+const A = window.Attention;
+const BUDGET = A.BUDGET_S;
+const nowMs = () => Date.now();
+let screen = A.createMeter(nowMs(), !document.hidden, "visible");
+let away = null, minutes = 60, loc = null, plan = null, nudgeDismissed = false, lastAria = -1;
 
-function fmt(ms) { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
-setInterval(() => { $("clock").textContent = "screen " + fmt((frozen ?? Date.now()) - t0); }, 500);
+document.addEventListener("visibilitychange", () => {
+  const t = nowMs(), vis = !document.hidden;
+  screen.setVisible(vis, t);
+  if (away) away.setVisible(vis, t);
+  tick();
+});
+
+const CIRC = 2 * Math.PI * 16;
+function tick() {
+  const t = nowMs(), ms = screen.ms(t), st = A.budgetState(ms, BUDGET);
+  $("budget").dataset.phase = st.phase;
+  $("arc").style.strokeDashoffset = st.phase === "over" ? "0" : String(CIRC * st.fraction);  // over: a full red ring
+  if (st.phase === "over") { $("b-num").textContent = "+" + st.overS + " s"; $("b-lbl").textContent = "over budget"; }
+  else { $("b-num").textContent = st.leftS + " s"; $("b-lbl").textContent = "screen budget left"; }
+  if (Math.floor(st.spentS / 15) !== lastAria) {  // keep screen readers informed without chatter
+    lastAria = Math.floor(st.spentS / 15);
+    $("budget").setAttribute("aria-label", `Screen budget: ${st.leftS} of ${BUDGET} seconds left`);
+  }
+  const downOn = $("down").classList.contains("on");
+  $("dim").style.opacity = downOn ? 0 : st.dim;
+  const showNudge = st.phase === "over" && !downOn && !nudgeDismissed;
+  if (showNudge && !$("nudge").classList.contains("on")) {
+    $("nudge-t").textContent = plan ? "Your 60 seconds are up. You have the plan; the rest is outside."
+                                    : "Your 60 seconds are up. Tip: plan the evening before, then just go.";
+    $("nudge-go").hidden = !plan;
+  }
+  $("nudge").classList.toggle("on", showNudge);
+  if (downOn) {
+    $("d-screen").textContent = A.fmt(ms);
+    const aw = away ? away.ms(t) : 0;
+    $("d-away").textContent = A.fmt(aw);
+    $("d-cmp").textContent = A.compareLine(ms, aw);
+  }
+}
+setInterval(tick, 500); tick();
+$("nudge-x").onclick = () => { nudgeDismissed = true; tick(); };
+$("nudge-go").onclick = () => phoneDown();
 
 fetch("/api/health").then(r => r.json()).then(h => {
   for (const [k, label] of Object.entries(h.presets)) {
     const b = document.createElement("button");
     b.className = "chip"; b.type = "button"; b.textContent = label.replace(" (demo start)", "");
+    b.setAttribute("aria-pressed", "false");
     b.onclick = () => {
       loc = { preset: k }; $("near").value = label;
       for (const x of $("presets").querySelectorAll("button")) x.setAttribute("aria-pressed", x === b);
@@ -158,65 +398,111 @@ $("start").oninput = () => $("now").setAttribute("aria-pressed", !$("start").val
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+const STEPS = ["Weather, sunset and air quality (Open-Meteo)", "Parks, water and what's mapped in them (OpenStreetMap)",
+               "Gemma picks one place and writes the card, on this computer"];
+function showSteps(active, secs) {
+  const el = $("steps"); el.hidden = false;
+  el.innerHTML = STEPS.map((s, i) => `<li class="${i < active ? "done" : i === active ? "now" : ""}"><i>${i < active ? "✓" : ""}</i>${esc(s)}${i === active && secs != null ? ` · ${secs} s` : ""}</li>`).join("")
+    + (active === 2 ? `<li class="note">Look away if you like: hidden time doesn't count against your budget.</li>` : "");
+}
+
 $("go").onclick = async () => {
   const q = new URLSearchParams({ minutes });
   if (loc) for (const [k, v] of Object.entries(loc)) q.set(k, v);
   else if ($("near").value.trim()) q.set("near", $("near").value.trim());
-  else { $("status").textContent = "Tell me where you're starting."; return; }
+  else { $("status").className = "status err"; $("status").textContent = "Tell me where you're starting."; return; }
   if ($("start").value) q.set("start", $("start").value);
-  $("go").disabled = true; $("out").innerHTML = "";
-  const steps = ["Checking the weather and sunset…", "Finding parks, water and viewpoints on OpenStreetMap…",
-                 "Gemma is writing your card on this computer…"];
+  $("go").disabled = true; $("out").innerHTML = ""; $("status").className = "status"; $("status").textContent = "";
   const started = Date.now();
-  $("status").className = "status"; $("status").textContent = steps[0];
-  const tick = setInterval(() => {
+  showSteps(0, 0);
+  const iv = setInterval(() => {
     const s = Math.floor((Date.now() - started) / 1000);
-    $("status").textContent = `${steps[Math.min(Math.floor(s / 2), steps.length - 1)]} ${s} s`;
+    showSteps(s < 1 ? 0 : s < 3 ? 1 : 2, s);
   }, 500);
   try {
     const r = await fetch("/api/plan?" + q);
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "failed");
-    plan = d; render(d); $("status").textContent = "";
+    plan = d; $("steps").hidden = true; render(d);
   } catch (e) {
-    $("status").className = "status err"; $("status").textContent = e.message;
-  } finally { clearInterval(tick); $("go").disabled = false; }
+    $("steps").hidden = true; $("status").className = "status err"; $("status").textContent = e.message;
+  } finally { clearInterval(iv); $("go").disabled = false; }
 };
 
+function compassSVG(deg, small) {
+  const ticks = [0, 45, 90, 135, 180, 225, 270, 315].map(a =>
+    `<line x1="50" y1="${a % 90 ? 9 : 7}" x2="50" y2="${a % 90 ? 13 : 15}" transform="rotate(${a} 50 50)" stroke="currentColor" stroke-width="${a % 90 ? 1.5 : 2.5}" opacity=".55"/>`).join("");
+  if (small) return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="6" opacity=".5"/><g transform="rotate(${deg} 50 50)"><path d="M50 14 L66 60 L50 50 L34 60 Z" fill="currentColor"/></g></svg>`;
+  return `<svg viewBox="0 0 100 100" role="img" aria-label="Arrow pointing ${esc(deg)} degrees from north">
+    <circle cx="50" cy="50" r="46" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+    <g style="color:var(--muted)">${ticks}</g>
+    <text x="50" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ring-over)" font-family="system-ui, sans-serif">N</text>
+    <g transform="rotate(${deg} 50 50)">
+      <line x1="50" y1="50" x2="50" y2="20" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M50 10 L59 25 L41 25 Z" fill="var(--accent)"/>
+    </g>
+    <circle cx="50" cy="50" r="5" fill="var(--ink)"/>
+  </svg>`;
+}
+
+function km(m) { return m >= 1000 ? (Math.round(m / 100) / 10).toFixed(1) + " km" : Math.max(100, Math.round(m / 50) * 50) + " m"; }
+
 function render(p) {
-  const wx = p.weather, s = p.model_stats || {};
+  const wx = p.weather, s = p.model_stats || {}, pl = p.place;
   const by = p.writer === "template"
-    ? `<span class="badge t">plain template</span>`
+    ? `<span class="badge t">Words: plain template (no model)</span>`
     : `<span class="badge">written by ${esc(p.writer)}</span>`;
-  const speed = s.wall_s ? ` · ${s.output_tokens} tokens in ${s.wall_s}s on CPU` : "";
-  const rej = (p.rejected || []).map(r => `<div class="meta">Model draft rejected by the checker: ${esc(r)}</div>`).join("");
+  const speed = s.wall_s ? ` · ${s.output_tokens} tokens in ${s.wall_s} s on CPU` : "";
+  const rej = (p.rejected || []).map(r => `<p>Model draft rejected by the checker: ${esc(r)}</p>`).join("");
+  const walk = p.walk_min, there = p.time_there_min, slack = Math.max(0, p.minutes - 2 * walk - there);
+  const seg = (cls, m) => m > 0 ? `<i class="${cls}" style="flex:${m}"></i>` : "";
+  const deg = pl.bearing_deg ?? 0;
+  const mapped = (pl.mapped_here || []).map(m => `<span>${esc(m.replace(" (water)", "").replace(" (in or beside it)", " (nearby)"))}</span>`).join("");
+  const notes = (p.data_notes || []).map(n => `<p>${esc(n)}</p>`).join("");
   $("out").innerHTML = `
-  <article class="card" id="card">
-    <h2>${esc(p.headline)}</h2>
-    <div>${by}</div>
-    <div class="times">
-      <div><b>${esc(p.now)}</b><span>leave</span></div>
-      <div><b>${esc(p.turn_around)}</b><span>turn back</span></div>
-      <div><b>${esc(p.back_by)}</b><span>back</span></div>
+  <article class="card" id="card" aria-label="Your pocket card">
+    <div class="pad">
+      <div class="eyebrow">${esc(p.date)} · from ${esc(p.start_label.replace(" (demo start)", ""))}</div>
+      <h2 class="place">${esc(pl.name)}</h2>
+      <div class="kind">${esc(pl.kind)} · about ${walk} min walk ${esc(pl.direction || "")}</div>
+      <p class="headline">${esc(p.headline)}</p>
     </div>
+    <div class="times">
+      <div><b>${esc(p.now)}</b><span>Leave</span></div>
+      <div class="turn"><b>${esc(p.turn_around)}</b><span>Turn back</span></div>
+      <div><b>${esc(p.back_by)}</b><span>Back</span></div>
+    </div>
+    <div class="tl" aria-hidden="true">${seg("w", walk)}${seg("t", there)}${seg("w", walk)}${seg("s", slack)}</div>
+    <div class="tl-legend"><span>${walk} min walk</span><span>${there} min at the place</span><span>${walk} back${slack ? ` + ${slack} spare` : ""}</span></div>
     ${(p.warnings || []).map(w => `<div class="warn">${esc(w)}</div>`).join("")}
-    <p style="margin:6px 0">${esc(p.route)}</p>
-    <p style="margin:6px 0">${esc(p.why)}</p>
-    <h3>Notice</h3><ul>${p.notice.map(n => `<li>${esc(n)}</li>`).join("")}</ul>
-    <h3>Bring</h3><ul>${p.bring.map(n => `<li>${esc(n)}</li>`).join("")}</ul>
-    <h3>Weather</h3>
-    <div>${esc(wx.sky)}, ${Math.round(wx.temp_c)}°C (feels ${Math.round(wx.feels_like_c)}°C), rain ${wx.rain_chance_pct}%,
-      wind ${Math.round(wx.wind_kmh)} km/h${wx.us_aqi != null ? `, US AQI ${wx.us_aqi}` : ""}. Sunset ${esc(wx.sunset)}.</div>
-    <p style="margin-top:14px;font-weight:600">${esc(p.phone_down_line)}</p>
-    <div class="meta">${esc(p.date)} · from ${esc(p.start_label)} ·
-      <a href="${esc(p.place.osm_url)}" target="_blank" rel="noopener">${esc(p.place.name)} on OpenStreetMap</a>${speed}</div>
-    ${rej}
-    <div class="meta">${esc(p.attribution)}</div>
+    <div class="dir">
+      ${compassSVG(deg)}
+      <div>
+        <div class="big">${esc((pl.direction || "").replace(/^./, c => c.toUpperCase()))} · ${deg}°</div>
+        <div class="sub">${km(pl.distance_m)} as the crow flies, about ${walk} min on foot</div>
+        <span class="tag">straight line, not a route</span>
+      </div>
+    </div>
+    <div class="sec"><h3>Why here, now</h3><p class="why">${esc(p.why)}</p></div>
+    <div class="sec"><h3>Three things to notice</h3><ol class="notice">${p.notice.map(n => `<li>${esc(n)}</li>`).join("")}</ol></div>
+    ${mapped ? `<div class="sec"><h3>On the map here</h3><div class="mapped">${mapped}</div></div>` : ""}
+    <div class="sec"><h3>Bring</h3><ul class="bring">${p.bring.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="sec"><h3>Weather while you're out</h3>
+      <div class="wx"><span><b>${esc(wx.sky)}</b>, ${Math.round(wx.temp_c)}°C</span><span>rain <b>${wx.rain_chance_pct}%</b></span>
+        <span>wind <b>${Math.round(wx.wind_kmh)}</b> km/h</span>${wx.us_aqi != null ? `<span>US AQI <b>${wx.us_aqi}</b></span>` : ""}
+        <span>sunset <b>${esc(wx.sunset)}</b></span></div></div>
+    <div class="pdl">${esc(p.phone_down_line)}</div>
+    <div class="foot">
+      ${by}<span>${esc(speed)}</span>
+      ${rej}${notes}
+      <p class="osm"><a href="${esc(pl.osm_url)}" target="_blank" rel="noopener">${esc(pl.name)} on OpenStreetMap</a> · walking times are estimates (straight line × 1.3)</p>
+      <p>${esc(p.attribution)}</p>
+    </div>
   </article>
   <div class="actions">
-    <button class="primary" id="b-down">Phone down</button>
-    <button id="b-print">Print pocket card</button>
-    <button id="b-ics">Turn-back alarm (.ics)</button>
+    <button class="primary" id="b-down" type="button">Phone down</button>
+    <button id="b-print" type="button">Print pocket card</button>
+    <button id="b-ics" type="button">Turn-back alarm (.ics)</button>
   </div>`;
   $("b-down").onclick = phoneDown;
   $("b-print").onclick = () => window.print();
@@ -225,18 +511,27 @@ function render(p) {
     a.href = URL.createObjectURL(new Blob([p.ics], { type: "text/calendar" }));
     a.download = "outside-hour.ics"; a.click();
   };
-  $("card").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("card").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 }
 
 function phoneDown() {
-  frozen = Date.now();
+  if (!plan) return;
+  const t = nowMs();
+  // The screen meter keeps running (looking at this screen is still screen time); a second meter starts
+  // counting the time the page is hidden from now on.
+  away = A.createMeter(t, !document.hidden, "hidden");
   $("d-place").textContent = plan.place.name;
+  $("d-dir").innerHTML = `${compassSVG(plan.place.bearing_deg ?? 0, true)}<span>${esc(plan.place.direction || "")}, about ${plan.walk_min} min on foot</span>`;
   $("d-turn").textContent = plan.turn_around;
   $("d-back").textContent = "Back by " + plan.back_by;
-  $("d-screen").textContent = `You spent ${fmt(frozen - t0)} on this screen. That's enough. Lock the phone and go.`;
   $("down").classList.add("on");
+  tick();
 }
-$("d-exit").onclick = () => $("down").classList.remove("on");
+$("d-exit").onclick = () => {
+  if (away) away.stop(nowMs());
+  $("down").classList.remove("on");
+  tick();
+};
 </script>
 </body>
 </html>

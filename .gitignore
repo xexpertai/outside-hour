@@ -6,6 +6,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 demo/raw/
+demo/raw-v2/
 .env*
 POST.md
 NOTES-FOR-HARSHA.md

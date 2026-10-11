@@ -113,3 +113,49 @@ def test_card_and_calendar(src):
     assert "OpenStreetMap contributors" in card and d["turn_around"] in card
     cal = ics(d)
     assert "BEGIN:VALARM" in cal and "DTSTART:20261011T070000" in cal
+
+
+def test_plan_has_direction_and_straight_line_distance(src):
+    p = plan(src, None, use_model=False)
+    assert 0 <= p.place["bearing_deg"] < 360
+    assert p.place["direction"] in p.route
+    assert p.place["distance_m"] > 0 and "straight line" in p.route
+
+
+def test_missing_feature_data_is_noted_not_fatal(src):
+    p = plan(src, None, use_model=False)  # the recorded fixture has no feature query
+    assert any("Mapped details" in n for n in p.data_notes)
+
+
+def cubbon_bench_pond():
+    s = FixtureSources()
+    park = next(e for e in s.d["overpass"]["elements"] if e.get("tags", {}).get("name") == "Cubbon Park")
+    b = park["bounds"]
+    lat, lon = (b["minlat"] + b["maxlat"]) / 2, (b["minlon"] + b["maxlon"]) / 2
+    s.d["overpass_features"] = {"elements": [
+        {"type": "node", "id": 1, "lat": lat, "lon": lon, "tags": {"amenity": "bench"}},
+        {"type": "node", "id": 2, "lat": lat, "lon": lon, "tags": {"amenity": "bench"}},
+        {"type": "way", "id": 3, "tags": {"natural": "water"},
+         "bounds": {"minlat": lat, "minlon": lon, "maxlat": lat + 0.0002, "maxlon": lon + 0.0002}},
+    ]}
+    return s
+
+
+def test_mapped_features_reach_the_model_and_the_card():
+    s = cubbon_bench_pond()
+    m = FakeModel([lambda f: dict(grounded(f), place_id=f["candidates"][0]["id"],
+                                  headline="Cubbon Park benches", why="Shady benches and a small pond.")])
+    p = plan(s, m)
+    top = m.facts[0]["candidates"][0]
+    assert top["name"] == "Cubbon Park"
+    assert "benches" in top["mapped_here"] and not any(c.isdigit() for c in " ".join(top["mapped_here"]))
+    assert any("water" in i for i in top["notice_ideas"])  # unlocked by the mapped pond
+    assert m.facts[0]["light"] == "early morning"
+    assert p.writer == "fake-gemma (test)"  # "pond" passes because OSM maps water inside the park
+    assert "2 benches mapped" in p.place["mapped_here"]
+
+
+def test_template_uses_mapped_details():
+    p = plan(cubbon_bench_pond(), None, use_model=False)
+    assert p.place["name"] == "Cubbon Park"
+    assert "Mapped there: Lotus Pond, Bamboo Island Pond" in p.why

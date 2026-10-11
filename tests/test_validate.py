@@ -87,3 +87,34 @@ def test_rejects_unsupported_features_and_odd_voice():
     lake = [Place("w2", "Lotus Pond", "water", 0, 0), C[0]]
     assert check(good(place_id="w2", headline="Lotus Pond at dawn", why="Clear and still.",
                       notice=["Watch the ripples.", "Count birds.", "Feel the cool air."]), lake, KNOWN, NUMS)[0]
+
+
+def park_with_pond():
+    return [Place("w1", "Cubbon Park", "park", 0, 0, features={"water": ["Lotus Pond"], "benches": 9}),
+            Place("w2", "Lotus Pond", "water", 0, 0), C[2]]
+
+
+def test_water_allowed_when_osm_maps_water_inside_the_park():
+    out = good(headline="Cubbon Park and Lotus Pond",
+               notice=["Watch the water surface at Lotus Pond.", "Count birds.", "Touch bark."])
+    # Without mapped water the same text is refused...
+    assert not check(out, C, KNOWN, NUMS)[0]
+    # ...with Lotus Pond mapped inside the chosen park it is fine, even though Lotus Pond is also a candidate.
+    assert check(out, park_with_pond(), KNOWN, NUMS) == (True, "ok")
+
+
+def test_other_candidates_still_rejected_when_park_has_features():
+    ok, why = check(good(why="Then walk on to Queen's Park."), park_with_pond(), KNOWN, NUMS)
+    assert not ok and "Queen's Park" in why
+
+
+def test_invented_place_still_rejected_with_features():
+    ok, why = check(good(why="Start at the Heron Lake Point."), park_with_pond(), KNOWN, NUMS)
+    assert not ok and "not in the fetched map data" in why
+
+
+def test_rejects_generic_filler():
+    ok, why = check(good(why="The park offers a pleasant spot to relax."), C, KNOWN, NUMS)
+    assert not ok and "generic" in why
+    ok, why = check(good(headline="Enjoy the park this morning"), C, KNOWN, NUMS)
+    assert not ok and "generic" in why

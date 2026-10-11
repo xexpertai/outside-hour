@@ -1,0 +1,373 @@
+{
+  "summary": {
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "threads": 8,
+    "model": "gemma-4-E2B-it-Q4_0",
+    "model_file_bytes": 2841481184,
+    "plans": 10,
+    "plans_written_by_model": 10,
+    "plans_fell_back_to_template": 0,
+    "drafts_rejected_total": 0,
+    "seconds_median": 28.705,
+    "seconds_min": 24.01,
+    "seconds_max": 32.31,
+    "output_tok_per_s_median": 9.65,
+    "prompt_tokens_median": 861.5,
+    "prompt_tok_per_s_median": 55.25,
+    "output_tokens_median": 133.5,
+    "cards_using_a_mapped_detail": 7,
+    "model_seconds_median": 28.695
+  },
+  "rows": [
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 30,
+      "start": "07:00",
+      "seconds": 24.14,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Rest House Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 24.14,
+        "prompt_tokens": 974,
+        "cached_prompt_tokens": 0,
+        "prompt_tok_per_s": 76.7,
+        "output_tokens": 120,
+        "output_tok_per_s": 10.4
+      },
+      "headline": "Rest House Park playground",
+      "why": "The playground and quiet beyond it suit the early morning light and clear weather.",
+      "notice": [
+        "Look for the sounds from the playground.",
+        "Observe the dew or wet leaves and how long the shadows are.",
+        "Notice the three trees with different bark."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 07:20.",
+      "light": "early morning",
+      "mapped_here": [
+        "a playground"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 60,
+      "start": "07:00",
+      "seconds": 28.37,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Cubbon Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 28.36,
+        "prompt_tokens": 952,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 68.6,
+        "output_tokens": 146,
+        "output_tok_per_s": 10.0
+      },
+      "headline": "Cubbon Park: Shade and Water",
+      "why": "Cubbon Park has the Lotus Pond and lots of trees, and the early morning light provides shade under the thickest group of trees.",
+      "notice": [
+        "Look at the water surface for one full minute at the Lotus Pond.",
+        "Examine the shape of the bark on the biggest tree you can find.",
+        "Sit on one bench for two minutes with your eyes closed."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 07:40.",
+      "light": "early morning",
+      "mapped_here": [
+        "Lotus Pond (water)",
+        "Karagada Kunte (water)",
+        "Bamboo Island Pond (water)",
+        "66 trees mapped",
+        "a wooded patch or tree row",
+        "89 benches mapped",
+        "Queen's Park (in or beside it)",
+        "Cubbon Park Circle (in or beside it)"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 90,
+      "start": "16:00",
+      "seconds": 32.31,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Cubbon Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 32.3,
+        "prompt_tokens": 990,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 57.3,
+        "output_tokens": 148,
+        "output_tok_per_s": 9.8
+      },
+      "headline": "Cubbon Park: Shade and Trees",
+      "why": "Cubbon Park has lots of trees and a wooded patch, and the afternoon light is good for sitting under the thickest group of trees.",
+      "notice": [
+        "Look at the water surface for one full minute at Lotus Pond.",
+        "Examine the shape of the biggest tree you can find and the shape of its bark.",
+        "Sit on one bench for two minutes with your eyes closed."
+      ],
+      "phone_down_line": "Put your phone away now. Turn back at 17:10.",
+      "light": "afternoon",
+      "mapped_here": [
+        "Lotus Pond (water)",
+        "Karagada Kunte (water)",
+        "Bamboo Island Pond (water)",
+        "66 trees mapped",
+        "a wooded patch or tree row",
+        "89 benches mapped",
+        "Queen's Park (in or beside it)",
+        "Cubbon Park Circle (in or beside it)"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 45,
+      "start": "06:30",
+      "seconds": 29.5,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Tank",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 29.49,
+        "prompt_tokens": 919,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 58.7,
+        "output_tokens": 141,
+        "output_tok_per_s": 10.1
+      },
+      "headline": "Lalbagh Tank and Trees",
+      "why": "The water surface is present, and the clear sky makes the light bright for observing the trees.",
+      "notice": [
+        "Observe the water surface for one full minute.",
+        "Look for the biggest tree you can find and note the shape of its bark.",
+        "Feel the dew or wet leaves and note how long the shadows are."
+      ],
+      "phone_down_line": "Put your phone away now and focus on the surroundings. Turn back at 07:05.",
+      "light": "early morning",
+      "mapped_here": [
+        "15 trees mapped",
+        "52 benches mapped",
+        "a viewpoint",
+        "a pond"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 60,
+      "start": "17:30",
+      "seconds": 24.01,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Tank",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 24.0,
+        "prompt_tokens": 661,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 55.3,
+        "output_tokens": 123,
+        "output_tok_per_s": 10.1
+      },
+      "headline": "Lalbagh Tank Water Surface",
+      "why": "The water surface is visible and the clear sky suits this time of day.",
+      "notice": [
+        "Observe the water surface for one full minute.",
+        "Look for the colour of the sky changing over a few minutes.",
+        "Notice the shape of the pond."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 17:42.",
+      "light": "before sunset",
+      "mapped_here": [
+        "15 trees mapped",
+        "52 benches mapped",
+        "a viewpoint",
+        "a pond"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 45,
+      "start": "07:00",
+      "seconds": 29.04,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Jaysingrao Ganpat Sasane Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 29.03,
+        "prompt_tokens": 804,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 55.2,
+        "output_tokens": 134,
+        "output_tok_per_s": 9.2
+      },
+      "headline": "Jaysingrao Ganpat Sasane Park Shade",
+      "why": "This park has a patch of shade that is noticeably cooler, which is good for the early morning light.",
+      "notice": [
+        "Look for dew or wet leaves and observe how long the shadows are.",
+        "Notice three trees with different bark.",
+        "Listen for the loudest bird to find it."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 07:28.",
+      "light": "early morning",
+      "mapped_here": [],
+      "data_notes": [],
+      "uses_mapped_detail": false
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 60,
+      "start": "18:30",
+      "seconds": 25.52,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "aminah park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 25.52,
+        "prompt_tokens": 592,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 50.6,
+        "output_tokens": 129,
+        "output_tok_per_s": 9.3
+      },
+      "headline": "aminah park with a patch of shade",
+      "why": "This park has a patch of shade that is noticeably cooler, which is good given the warm weather and dark conditions.",
+      "notice": [
+        "Look for three trees with different bark.",
+        "Listen for the loudest bird.",
+        "Find a patch of shade that is noticeably cooler."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 19:22.",
+      "light": "after dark",
+      "mapped_here": [],
+      "data_notes": [],
+      "uses_mapped_detail": false
+    },
+    {
+      "run": 0,
+      "preset": "mg-road",
+      "minutes": 45,
+      "start": "12:30",
+      "seconds": 29.72,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Mahatma Gandhi Park",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 29.7,
+        "prompt_tokens": 773,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 51.2,
+        "output_tokens": 139,
+        "output_tok_per_s": 9.5
+      },
+      "headline": "Mahatma Gandhi Park with a bench",
+      "why": "The biggest tree you can find and one bench offer a cool patch of shade during this midday light.",
+      "notice": [
+        "Look at the shape of the bark on the biggest tree you can find.",
+        "Sit on one bench for two minutes with your eyes closed.",
+        "Notice the smell of wet soil and leaves."
+      ],
+      "phone_down_line": "Please put your phone away now and focus on the surroundings. Turn back at 12:58.",
+      "light": "midday",
+      "mapped_here": [
+        "13 trees mapped",
+        "a bench mapped"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    },
+    {
+      "run": 0,
+      "preset": "lalbagh",
+      "minutes": 90,
+      "start": "07:00",
+      "seconds": 32.28,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Lalbagh Tank",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 32.27,
+        "prompt_tokens": 953,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 51.3,
+        "output_tokens": 116,
+        "output_tok_per_s": 8.4
+      },
+      "headline": "Lalbagh Tank water surface",
+      "why": "The water surface is present and the clear sky suit this early morning light.",
+      "notice": [
+        "Observe the water surface for one full minute.",
+        "Notice the dew or wet leaves.",
+        "Feel how long the shadows are."
+      ],
+      "phone_down_line": "Put your phone away now. Turn back at 08:20.",
+      "light": "early morning",
+      "mapped_here": [
+        "15 trees mapped",
+        "52 benches mapped",
+        "a viewpoint",
+        "a pond"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": false
+    },
+    {
+      "run": 0,
+      "preset": "pune-empress",
+      "minutes": 30,
+      "start": "16:30",
+      "seconds": 25.94,
+      "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+      "place": "Empress Botanical Garden",
+      "rejected": [],
+      "stats": {
+        "model": "gemma-4-E2B-it-Q4_0",
+        "wall_s": 25.93,
+        "prompt_tokens": 575,
+        "cached_prompt_tokens": 457,
+        "prompt_tok_per_s": 49.2,
+        "output_tokens": 133,
+        "output_tok_per_s": 9.3
+      },
+      "headline": "Empress Botanical Garden: Shade and Trees",
+      "why": "The shade under the thickest group of trees and a sunny bench will feel cooler in this afternoon light.",
+      "notice": [
+        "Look for the shade under the thickest group of trees.",
+        "Compare how warm a sunny bench or stone feels with a shady one.",
+        "Notice three trees with different bark."
+      ],
+      "phone_down_line": "Please put your phone away now. Turn back at 16:51.",
+      "light": "afternoon",
+      "mapped_here": [
+        "a wooded patch or tree row"
+      ],
+      "data_notes": [],
+      "uses_mapped_detail": true
+    }
+  ]
+}

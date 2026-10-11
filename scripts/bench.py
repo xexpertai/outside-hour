@@ -37,9 +37,26 @@ def cpu_name():
     return platform.processor()
 
 
+FEATURE_WORDS = ("pond", "lake", "tank", "water", "bench", "tree", "bark", "tap", "playground", "viewpoint", "wooded",
+                 "toilet", "lit ")
+
+
+def uses_mapped_detail(p) -> bool:
+    """Crude, transparent check: does the card's text mention something from the place's mapped_here list?"""
+    text = " ".join([p.headline, p.why] + list(p.notice)).lower()
+    for m in p.place.get("mapped_here", []):
+        name = m.split(": ", 1)[-1].lower()
+        if ": " in m and name in text:
+            return True
+        if any(w in m.lower() and w in text for w in FEATURE_WORDS):
+            return True
+    return False
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=1)  # >1 repeats identical prompts (prompt cache hits)
+    ap.add_argument("--out", default="docs/bench-results.json")
     a = ap.parse_args()
     src = Sources(offline=os.environ.get("BENCH_ONLINE") != "1")
     client = llm.LlamaServer()
@@ -52,8 +69,10 @@ def main():
             rows.append({
                 "run": r, "preset": preset, "minutes": minutes, "start": start,
                 "seconds": round(time.perf_counter() - t, 2), "writer": p.writer, "place": p.place["name"],
-                "rejected": p.rejected, "stats": p.model_stats, "headline": p.headline,
-                "notice": p.notice, "phone_down_line": p.phone_down_line,
+                "rejected": p.rejected, "stats": p.model_stats, "headline": p.headline, "why": p.why,
+                "notice": p.notice, "phone_down_line": p.phone_down_line, "light": p.light,
+                "mapped_here": p.place.get("mapped_here", []), "data_notes": p.data_notes,
+                "uses_mapped_detail": uses_mapped_detail(p),
             })
             print(f"{preset:13} {minutes:3} {start}  {rows[-1]['seconds']:6.1f}s  "
                   f"{'MODEL' if p.writer != 'template' else 'TEMPLATE'}  rejected={len(p.rejected)}  {p.place['name']}",
@@ -73,11 +92,12 @@ def main():
         "prompt_tokens_median": statistics.median([x["stats"]["prompt_tokens"] for x in rows if x["stats"]]),
         "prompt_tok_per_s_median": statistics.median([x["stats"]["prompt_tok_per_s"] for x in rows if x["stats"]]),
         "output_tokens_median": statistics.median([x["stats"]["output_tokens"] for x in rows if x["stats"]]),
+        "cards_using_a_mapped_detail": sum(x["uses_mapped_detail"] for x in rows if x["writer"] != "template"),
         "model_seconds_median": statistics.median([x["stats"]["wall_s"] for x in rows if x["stats"]]),
     }
     out = {"summary": summary, "rows": rows}
     (ROOT / "docs").mkdir(exist_ok=True)
-    (ROOT / "docs" / "bench-results.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
+    (ROOT / a.out).write_text(json.dumps(out, indent=2, ensure_ascii=False))
     print(json.dumps(summary, indent=2))
 
 

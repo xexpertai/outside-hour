@@ -1,0 +1,105 @@
+{
+  "start_label": "MG Road metro station, Bengaluru (demo start)",
+  "lat": 12.9755,
+  "lon": 77.6068,
+  "now": "07:00",
+  "date": "2026-10-12",
+  "minutes_asked": 60,
+  "minutes": 60,
+  "place": {
+    "id": "w22895320",
+    "name": "Cubbon Park",
+    "kind": "park",
+    "lat": 12.97417425,
+    "lon": 77.59341465,
+    "osm_url": "https://www.openstreetmap.org/way/22895320",
+    "details": {
+      "dog": "leashed"
+    },
+    "mapped_here": [
+      "Lotus Pond (water)",
+      "Karagada Kunte (water)",
+      "Bamboo Island Pond (water)",
+      "66 trees mapped",
+      "a wooded patch or tree row",
+      "89 benches mapped",
+      "Queen's Park (in or beside it)",
+      "Cubbon Park Circle (in or beside it)"
+    ],
+    "distance_m": 856,
+    "bearing_deg": 270,
+    "direction": "west"
+  },
+  "alternatives": [
+    {
+      "name": "Ulsoor Lake",
+      "kind": "water",
+      "walk_min": 17,
+      "direction": "east"
+    },
+    {
+      "name": "Queen's Park",
+      "kind": "park",
+      "walk_min": 15,
+      "direction": "west"
+    },
+    {
+      "name": "Jawahar Bal Bhavan Childrens Park",
+      "kind": "park",
+      "walk_min": 15,
+      "direction": "west"
+    }
+  ],
+  "walk_min": 15,
+  "time_there_min": 25,
+  "turn_around": "07:40",
+  "back_by": "08:00",
+  "route": "Walk about 15 min west to Cubbon Park (~900 m in a straight line). Spend about 25 min there. Turn back at 07:40.",
+  "weather": {
+    "sky": "clear",
+    "temp_c": 23,
+    "feels_like_c": 25,
+    "rain_chance_pct": 0,
+    "wind_kmh": 10,
+    "uv_index": 3,
+    "us_aqi": 82,
+    "pm2_5": 38.2,
+    "sunrise": "06:09",
+    "sunset": "18:02",
+    "timezone": "Asia/Kolkata"
+  },
+  "bring": [
+    "Keys and this card (phone can stay in your pocket)",
+    "Water bottle"
+  ],
+  "warnings": [],
+  "headline": "Cubbon Park: Shade and Water",
+  "why": "Cubbon Park has lots of trees and a wooded patch, and the shade under the thickest group of trees suits this early morning light.",
+  "notice": [
+    "Look at the water surface for one full minute at Lotus Pond.",
+    "Examine the shape of the bark on the biggest tree you can find.",
+    "Sit on one bench for two minutes with your eyes closed."
+  ],
+  "phone_down_line": "Please put your phone away now and focus on the park surroundings. Turn back at 07:40.",
+  "writer": "gemma-4-E2B-it-Q4_0 (local, llama.cpp)",
+  "rejected": [],
+  "model_stats": {
+    "model": "gemma-4-E2B-it-Q4_0",
+    "wall_s": 29.06,
+    "prompt_tokens": 1,
+    "cached_prompt_tokens": 1408,
+    "prompt_tok_per_s": 3.5,
+    "output_tokens": 152,
+    "output_tok_per_s": 5.3
+  },
+  "data_notes": [],
+  "light": "early morning",
+  "attribution": "Map data © OpenStreetMap contributors (ODbL). Weather & air quality: Open-Meteo.com (CC BY 4.0).",
+  "timings_s": {
+    "weather": 0,
+    "places": 0.01,
+    "model": 29.07,
+    "total": 29.09
+  },
+  "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//outside-hour//EN\r\nBEGIN:VEVENT\r\nUID:outside-hour-20261012T070000@local\r\nDTSTAMP:20261011T173245Z\r\nDTSTART:20261012T070000\r\nDTEND:20261012T080000\r\nSUMMARY:Outside: Cubbon Park\r\nDESCRIPTION:Walk about 15 min west to Cubbon Park (~900 m in a straight li\r\n ne). Spend about 25 min there. Turn back at 07:40.\\n- Look at the water s\r\n urface for one full minute at Lotus Pond.\\n- Examine the shape of the bar\r\n k on the biggest tree you can find.\\n- Sit on one bench for two minutes w\r\n ith your eyes closed.\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Turn back now\r\nTRIGGER;RELATED=END:-PT20M\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+}

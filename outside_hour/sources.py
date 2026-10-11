@@ -123,6 +123,17 @@ class Sources:
                 last_err = e
         raise RuntimeError(f"Overpass unavailable: {last_err}")
 
+    def overpass_features(self, lat: float, lon: float, radius_m: int, timeout: float = 12) -> Fetched:
+        """Optional second query (benches, trees, taps, unnamed ponds). One short try: the plan works without
+        it, so a busy Overpass server never holds a plan up for long."""
+        lat, lon = round(lat, 3), round(lon, 3)
+        body = urllib.parse.urlencode({"data": build_features_query(lat, lon, radius_m)})
+        saved, self.timeout = self.timeout, timeout
+        try:
+            return self._get("overpass", OVERPASS_URLS[0], body, min_gap=2.0, cache_id="overpass-features")
+        finally:
+            self.timeout = saved
+
     def forecast(self, lat: float, lon: float) -> Fetched:
         params = {
             "latitude": round(lat, 2),
@@ -154,5 +165,19 @@ def build_overpass_query(lat: float, lon: float, radius_m: int) -> str:
         f'nwr({a})["natural"~"^(water|peak|wood|beach|tree_row)$"]["name"];'
         f'nwr({a})["landuse"="forest"]["name"];'
         f'way({a})["highway"~"^(path|footway|track)$"]["name"];'
+        ");out bb tags;"
+    )
+
+
+def build_features_query(lat: float, lon: float, radius_m: int) -> str:
+    """Unnamed things that make a place specific. Used only as "mapped here" features, never as places."""
+    a = f"around:{int(radius_m)},{lat},{lon}"
+    return (
+        "[out:json][timeout:25];("
+        f'nwr({a})["natural"="water"][!"name"];'
+        f'nwr({a})["natural"~"^(wood|tree_row)$"][!"name"];'
+        f'node({a})["natural"="tree"];'
+        f'node({a})["amenity"~"^(bench|drinking_water|toilets)$"];'
+        f'nwr({a})["leisure"="playground"];'
         ");out bb tags;"
     )

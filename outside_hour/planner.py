@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 
 from . import llm, validate
-from .places import Place, parse_elements, rank, search_radius_m
+from .places import Place, feature_phrases, has_water, parse_elements, rank, search_radius_m
 from .sources import Sources
 from .weather import Window, local_now, summarise
 
@@ -39,6 +39,27 @@ NOTICE_IDEAS = {
     "woodland": ["the oldest-looking tree", "how many sounds you can count while standing still",
                  "moss, fungi or seeds on the ground", "the smell of the soil"],
     "nature reserve": ["the oldest-looking tree", "an animal track or a feather", "how many birdsongs you can tell apart"],
+}
+
+# Ideas unlocked by what OpenStreetMap maps inside a place (see places.features_inside).
+FEATURE_IDEAS = {
+    "water": "the water surface for one full minute",
+    "trees": "the biggest tree you can find, and the shape of its bark",
+    "benches": "one bench, sitting on it for two minutes with your eyes closed",
+    "woods_or_tree_rows": "the shade under the thickest group of trees",
+    "viewpoint": "the furthest thing you can see from the viewpoint",
+    "named_spots": "the sign or entrance of the spot inside it",
+    "playground": "the sounds from the playground, then the quiet beyond it",
+    "drinking_water": "the drinking-water tap, to refill before you turn back",
+}
+# Ideas that depend on the light, so the same park reads differently at 07:00 and at 17:30.
+LIGHT_IDEAS = {
+    "early morning": "dew or wet leaves, and how long the shadows are",
+    "morning": "which side of the paths is in sun and which in shade",
+    "midday": "the coolest patch of shade",
+    "afternoon": "how warm a sunny bench or stone feels compared with a shady one",
+    "before sunset": "the colour of the sky changing over a few minutes",
+    "after dark": "which lights come on, and what sounds are left",
 }
 
 DEFAULT_NOTICE = ["Look up at the sky for a full minute.", "Find one thing that is a colour you rarely see.",
@@ -74,6 +95,7 @@ class Plan:
     rejected: list = field(default_factory=list)
     model_stats: dict = field(default_factory=dict)
     data_notes: list = field(default_factory=list)
+    light: str = ""
     attribution: str = ATTRIBUTION
     timings_s: dict = field(default_factory=dict)
 
@@ -116,6 +138,42 @@ def warnings_for(w: Window, after_dark: bool, cut: bool) -> list[str]:
     if cut:
         out.append(f"Shortened so you are back before sunset ({hhmm(w.sunset)}).")
     return out
+
+
+def light_of_day(now: datetime, sunrise: datetime | None, sunset: datetime | None) -> str:
+    """A plain label for the light while you are out (from code, so the model can't get it wrong)."""
+    if sunrise and sunset:
+        if now < sunrise or now >= sunset:
+            return "after dark"
+        if now < sunrise + timedelta(hours=2):
+            return "early morning"
+        if sunset - now <= timedelta(minutes=90):
+            return "before sunset"
+    h = now.hour
+    if h < 11:
+        return "morning"
+    if h < 15:
+        return "midday"
+    return "afternoon"
+
+
+def ideas_for(p: Place, light: str, wet: bool) -> list[str]:
+    """Up to five 'things to notice' ideas for one candidate: its features first, then the light, then its kind."""
+    out: list[str] = []
+    f = p.features
+    if has_water(p):
+        out.append(FEATURE_IDEAS["water"])
+    for key in ("trees", "woods_or_tree_rows", "benches", "viewpoint", "named_spots", "playground"):
+        if f.get(key) and FEATURE_IDEAS[key] not in out:
+            out.append(FEATURE_IDEAS[key])
+    if light in LIGHT_IDEAS:
+        out.append(LIGHT_IDEAS[light])
+    if wet:
+        out.append("the smell of wet soil and leaves")
+    for idea in NOTICE_IDEAS.get(p.kind, []):
+        if idea not in out:
+            out.append(idea)
+    return out[:5]
 
 
 def allowed_numbers(plan_facts: dict) -> set[str]:
@@ -183,17 +241,24 @@ def make_plan(src: Sources, lat: float, lon: float, minutes: int, start_label: s
     t1 = time.perf_counter()
     radius = search_radius_m(max(eff, 90))  # one cache entry per spot for any trip up to 90 min
     op = src.overpass(lat, lon, radius)
-    places = parse_elements(op.data.get("elements", []), lat, lon)
+    extra: list = []
+    try:  # benches, trees, taps, unnamed ponds: makes the card specific, but is optional
+        extra = src.overpass_features(lat, lon, radius).data.get("elements", [])
+    except Exception:
+        notes.append("Mapped details (benches, trees, ponds) unavailable right now.")
+    places = parse_elements(op.data.get("elements", []), lat, lon, extra=extra)
     budget = eff // 2 if after_dark else eff
     cands = rank(places, budget, wet=w.wet, limit=5)
     timings["places"] = round(time.perf_counter() - t1, 2)
     if not cands:
         raise NoPlaces(f"No named parks, water, viewpoints or paths found within {radius} m in OpenStreetMap.")
 
+    light = light_of_day(now, sunrise, sunset)
     weather = {
         "sky": w.sky, "temp_c": w.temp_c, "feels_like_c": w.feels_c, "rain_chance_pct": w.rain_pct,
         "wind_kmh": w.wind_kmh, "uv_index": w.uv, "us_aqi": w.aqi, "pm2_5": w.pm25,
-        "sunset": hhmm(sunset) if sunset else None, "timezone": w.tz_name,
+        "sunrise": hhmm(sunrise) if sunrise else None, "sunset": hhmm(sunset) if sunset else None,
+        "timezone": w.tz_name,
     }
     bring = bring_list(w, eff, after_dark)
     warns = warnings_for(w, after_dark, cut)
@@ -208,13 +273,13 @@ def make_plan(src: Sources, lat: float, lon: float, minutes: int, start_label: s
     facts = {
         "minutes_available": eff,
         "local_time_now": hhmm(now),
-        "after_dark": after_dark,
-        "weather": {k: v for k, v in weather.items() if k not in ("timezone", "pm2_5") and v is not None},
+        "light": light,
+        "weather": {k: v for k, v in weather.items() if k not in ("timezone", "pm2_5", "sunrise") and v is not None},
         "warnings": warns,
-        "notice_ideas": {k: NOTICE_IDEAS[k] for k in sorted({p.kind for p in cands}) if k in NOTICE_IDEAS},
-        "candidates": [dict({k: v for k, v in p.as_fact().items() if v not in (None, {}, "")}, **{"time_there_min": timing_for(p)["there"],
-                                            "turn_around_at": timing_for(p)["turn"],
-                                            "back_by": timing_for(p)["back"]}) for p in cands],
+        "candidates": [dict({k: v for k, v in p.as_fact().items() if v not in (None, {}, "", [])},
+                            **{"time_there_min": timing_for(p)["there"], "turn_around_at": timing_for(p)["turn"],
+                               "back_by": timing_for(p)["back"], "notice_ideas": ideas_for(p, light, w.wet)})
+                       for p in cands],
     }
     known_names = [p.name for p in places] + [start_label]
     times = {p.id: dict(timing_for(p), now=hhmm(now)) for p in cands}
@@ -241,7 +306,7 @@ def make_plan(src: Sources, lat: float, lon: float, minutes: int, start_label: s
             rejected.append(f"model unavailable: {e}")
         timings["model"] = round(time.perf_counter() - t2, 2)
     if prose is None:
-        prose = template_prose(chosen, timing_for(chosen), w)
+        prose = template_prose(chosen, timing_for(chosen), w, light)
 
     tm = timing_for(chosen)
     line = prose["phone_down_line"].strip()
@@ -254,7 +319,10 @@ def make_plan(src: Sources, lat: float, lon: float, minutes: int, start_label: s
     return Plan(
         start_label=start_label, lat=lat, lon=lon, now=hhmm(now), date=now.date().isoformat(), minutes_asked=minutes, minutes=eff,
         place={"id": chosen.id, "name": chosen.name, "kind": chosen.kind, "lat": chosen.lat, "lon": chosen.lon,
-               "osm_url": chosen.osm_url, "details": chosen.details},
+               "osm_url": chosen.osm_url, "details": chosen.details, "mapped_here": feature_phrases(chosen),
+               "distance_m": int(round(chosen.distance_m)), "bearing_deg": chosen.bearing_deg,
+               "direction": chosen.bearing},
+        light=light,
         alternatives=[{"name": p.name, "kind": p.kind, "walk_min": p.walk_min, "direction": p.bearing}
                       for p in cands if p.id != chosen.id][:3],
         walk_min=tm["walk"], time_there_min=tm["there"], turn_around=tm["turn"], back_by=tm["back"],
@@ -265,13 +333,20 @@ def make_plan(src: Sources, lat: float, lon: float, minutes: int, start_label: s
     )
 
 
-def template_prose(p: Place, tm: dict, w: Window) -> dict:
+def template_prose(p: Place, tm: dict, w: Window, light: str = "") -> dict:
+    mapped = [m.replace(" (water)", "").replace(" (in or beside it)", "") for m in feature_phrases(p)]
+    extra = f" Mapped there: {', '.join(mapped[:3])}." if mapped else ""
+    notice = list(NOTICE_BY_KIND.get(p.kind, DEFAULT_NOTICE))
+    if has_water(p) and p.kind != "water":
+        notice[2] = "Watch the water surface for one full minute."
+    if light in LIGHT_IDEAS:
+        notice[1] = "Notice " + LIGHT_IDEAS[light] + "."
     return {
         "place_id": p.id,
         "headline": f"{p.name}, there and back by {tm['back']}",
         "why": f"A {p.kind} about {tm['walk']} minutes' walk away, which leaves about {tm['there']} minutes "
-               f"there. Forecast: {w.sky}, {w.temp_c:.0f}°C.",
-        "notice": NOTICE_BY_KIND.get(p.kind, DEFAULT_NOTICE),
+               f"there. Forecast: {w.sky}, {w.temp_c:.0f}°C.{extra}",
+        "notice": notice,
         "phone_down_line": "Phone in your pocket. Look up.",
     }
 
